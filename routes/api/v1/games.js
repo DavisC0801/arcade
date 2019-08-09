@@ -2,16 +2,12 @@ var express = require("express");
 var router = express.Router();
 var game = require('../../../models').Game;
 
-router.post("/", function(req, res) {
-  game.create({
-    title: req.body.title,
-    price: req.body.price,
-    releaseYear: req.body.releaseYear,
-    active: req.active
-  })
-  .then(game => {
+router.delete("/:id", function(req, res){
+  let toDestroy = game.findByPk(req.params.id)
+  .then(toDestroy => {
+    toDestroy.destroy();
     res.setHeader("Content-Type", "application/json");
-    res.status(200).send(JSON.stringify(game));
+    res.status(204).send(JSON.stringify(toDestroy));
   })
   .catch(game => {
     res.setHeader("Content-Type", "application/json");
@@ -19,28 +15,67 @@ router.post("/", function(req, res) {
   })
 })
 
+router.patch("/:id", function(req, res){
+  game.update({
+    title: req.body.title,
+    price: req.body.price,
+    releaseYear: req.body.releaseYear,
+    active: req.body.active
+  },{
+    returning: true,
+    where: {
+      id: parseInt(req.params.id)
+    }
+  })
+  .then(([rowsUpdate, [updatedGame]]) => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(202).send(JSON.stringify(updatedGame));
+  })
+  .catch(game => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(500).send({error});
+  })
+})
+
+router.post("/", function(req, res) {
+  game.create({
+    title: req.body.title,
+    price: req.body.price,
+    releaseYear: req.body.releaseYear,
+    active: req.body.active
+  })
+  .then(game => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(201).send(JSON.stringify(game));
+  })
+  .catch(error => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(500).send({error})
+  });
+})
+
 router.get("/:id", function(req, res) {
   game.findByPk(req.params.id)
-    .then(games => {
-      res.setHeader("Content-Type", "application/json");
-      res.status(200).send(JSON.stringify(games));
-    })
-    .catch(error => {
-      res.setHeader("Content-Type", "application/json");
-      res.status(500).send({error})
-    });
+  .then(game => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).send(JSON.stringify(game));
+  })
+  .catch(error => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(500).send({error})
+  });
 });
 
 router.get("/", function(req, res) {
   game.findAll()
-    .then(games => {
-      res.setHeader("Content-Type", "application/json");
-      res.status(200).send(JSON.stringify(games));
-    })
-    .catch(error => {
-      res.setHeader("Content-Type", "application/json");
-      res.status(500).send({error})
-    });
+  .then(game => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).send(JSON.stringify(game));
+  })
+  .catch(error => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(500).send({error})
+  });
 });
 
 module.exports = router;
