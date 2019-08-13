@@ -3,13 +3,13 @@ var router = express.Router();
 var game = require('../../../models').Game;
 
 router.delete("/:id", function(req, res){
-  let toDestroy = game.findByPk(req.params.id)
+  let toDestroy = game.findByPk(req.params.id);
+  toDestroy.destroy()
   .then(toDestroy => {
-    toDestroy.destroy();
     res.setHeader("Content-Type", "application/json");
-    res.status(204).send(JSON.stringify(toDestroy));
+    res.status(204);
   })
-  .catch(game => {
+  .catch(error => {
     res.setHeader("Content-Type", "application/json");
     res.status(500).send({error});
   })
@@ -31,7 +31,7 @@ router.patch("/:id", function(req, res){
     res.setHeader("Content-Type", "application/json");
     res.status(202).send(JSON.stringify(updatedGame));
   })
-  .catch(game => {
+  .catch(error => {
     res.setHeader("Content-Type", "application/json");
     res.status(500).send({error});
   })

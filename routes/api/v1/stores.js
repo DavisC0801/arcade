@@ -2,6 +2,23 @@ var express = require("express");
 var router = express.Router();
 var store = require('../../../models').Store;
 
+router.delete('/:id', function(req, res){
+  store.destroy({
+    returning: true,
+    where: {
+      id: parseInt(req.params.id)
+    }
+  })
+  .then(store => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(204);
+  })
+  .catch(error => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(500).send({error});
+  });
+});
+
 router.patch('/:id', function(req, res){
   store.update({
     title: req.body.title,
@@ -10,6 +27,7 @@ router.patch('/:id', function(req, res){
     returning: true,
     where: {
       id: parseInt(req.params.id)
+    }
   })
   .then(store => {
     res.setHeader("Content-Type", "application/json");
