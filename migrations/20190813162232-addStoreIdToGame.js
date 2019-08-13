@@ -6,7 +6,7 @@ module.exports = {
       'Games',
       'StoreId',
       {
-        type: sequelize.INTEGER,
+        type: Sequelize.INTEGER,
         references: {
           model: 'Stores',
           key: 'id'
